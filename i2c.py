@@ -31,6 +31,7 @@ def select():
     mylcd.lcd_clear()
     mylcd.lcd_display_string("1. FND", 1)
     mylcd.lcd_display_string("2. motor", 2)
+    print("1. FND\n2. motor\n3. ultrasonic\n4. tempPressure")
     return int(input())
 
 
@@ -52,9 +53,10 @@ def motor():
     sleep(1) 
     
     #print('Rotating at interval of 0-12 degrees')
-    Servo.ChangeDutyCycle(angle // 18)
+    Servo.ChangeDutyCycle(angle / 18)
     sleep(1)
-    Servo.stop()
+    Servo.ChangeDutyCycle(1)
+    sleep(1)
     #gpio.cleanup()
     #print('Everythings cleanup')
     
@@ -109,12 +111,21 @@ def tempPressure():
         pascals = sensor.read_pressure()
         hectopascals = pascals / 100
 #        humidity = sensor.read_humidity()
-        if degrees >= 23:
-            segmentNumber(warning)
-            warning = abs(warning - 10)
+        
         mylcd.lcd_display_string(f"temp: {degrees}", 1)
         mylcd.lcd_display_string(f"pressure: {hectopascals}hPa", 2)
-        sleep(1)
+
+        if degrees >= 28:
+            segmentNumber(warning)
+            warning = abs(warning - 10)
+            Servo.start(1)
+            sleep(1) 
+    
+            #print('Rotating at interval of 0-12 degrees')
+            Servo.ChangeDutyCycle(1 if warning == 0 else 10)
+            sleep(1)
+        
+        
         
         
     
